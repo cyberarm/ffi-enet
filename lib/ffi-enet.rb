@@ -3,8 +3,8 @@ require "ffi"
 module LibENet
   extend FFI::Library
   ffi_lib [
-    "#{File.expand_path(__dir__)}#{RUBY_PLATFORM =~ /^x64-/ ? '/../lib64' : ''}/enet.so",
-    "#{File.expand_path(__dir__)}#{RUBY_PLATFORM =~ /^x64-/ ? '/../lib64' : ''}/enet.dll",
+    "#{File.expand_path(__dir__)}#{RUBY_PLATFORM =~ /^x86_64-/ ? '/../lib64' : ''}/libenet.so",
+    "#{File.expand_path(__dir__)}#{RUBY_PLATFORM =~ /^x64-/ ? '/../lib64' : ''}/libenet.dll",
     "enet"
   ]
 
