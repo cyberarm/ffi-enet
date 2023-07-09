@@ -19,18 +19,13 @@ module ENet
       @_address[:port] = @port
 
       @_host = LibENet.enet_host_create(nil, 1, @channels, @download_bandwidth, @upload_bandwidth)
-      pp @_host
-      if @_host == nil
-        raise "Failed to create host"
-      end
+
+      raise "Failed to create host" if @_host.nil?
     end
 
     def connect(timeout_ms)
       @_connection = LibENet.enet_host_connect(@_host, @_address, @channels, 0)
-      pp @_connection
-      if @_connection == nil
-        raise "Cannot connect to remote host"
-      end
+      raise "Cannot connect to remote host" if @_connection.nil?
 
       result = LibENet.enet_host_service(@_host, @enet_event, timeout_ms)
 

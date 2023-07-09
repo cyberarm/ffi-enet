@@ -48,7 +48,7 @@ module ENet
     end
 
     def packet_loss
-      @_peer[:packet_loss]#.to_f / LibENet::ENET_PEER_PACKET_LOSS_SCALE
+      @_peer[:packet_loss] # .to_f / LibENet::ENET_PEER_PACKET_LOSS_SCALE
     end
 
     def last_round_trip_time

@@ -21,7 +21,7 @@ module ENet
       end
     end
 
-    return true
+    true
   end
 
   def self.shutdown

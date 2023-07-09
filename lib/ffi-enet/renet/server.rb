@@ -20,10 +20,7 @@ module ENet
       @_address[:port] = @port
 
       @_host = LibENet.enet_host_create(@_address, @max_clients, @channels, @download_bandwidth, @upload_bandwidth)
-      pp @_host
-      if @_host == nil
-        raise "Failed to create server"
-      end
+      raise "Failed to create server" if @_host.nil?
     end
 
     def disconnect_client(client)
@@ -40,21 +37,21 @@ module ENet
       packet = LibENet.enet_packet_create(data, data.length, reliable ? 1 : 0)
       LibENet.enet_peer_send(client._peer, channel, packet)
 
-      pp [
-        client.packets_sent,
-        client.packets_received,
-        client.data_sent,
-        client.data_received,
+      # pp [
+      #   client.packets_sent,
+      #   client.packets_received,
+      #   client.data_sent,
+      #   client.data_received,
 
-        client.packets_lost,
-        client.packet_loss,
+      #   client.packets_lost,
+      #   client.packet_loss,
 
-        client.round_trip_time,
-        client.last_round_trip_time,
+      #   client.round_trip_time,
+      #   client.last_round_trip_time,
 
-        client.last_receive_time,
-        client.last_send_time
-      ]
+      #   client.last_receive_time,
+      #   client.last_send_time
+      # ]
     end
 
     def broadcast_packet(data, reliable:, channel:)

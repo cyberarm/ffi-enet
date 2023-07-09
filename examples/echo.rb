@@ -21,7 +21,7 @@ Thread.new do
     send_packet(client, "Goodbye World", reliable: true, channel: 1)
   end
 
-  while true
+  loop do
     server.update(1_000)
   end
 end
@@ -49,6 +49,6 @@ end
 
 connection.connect(5_000)
 
-while true
+loop do
   connection.update(1_000)
 end
