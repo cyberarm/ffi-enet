@@ -4,15 +4,19 @@ module ENet
 
     attr_reader :_peer, :id, :address
 
-    def self.enet_host_address_to_ipv4(int)
-      "#{int & 0xff}.#{int >> 8 & 0xff}.#{int >> 16 & 0xff}.#{int >> 24 & 0xff}"
+    def self.enet_host_address_to_ipv4(address)
+      str_ptr = FFI::MemoryPointer.new(:char, 256)
+      result = LibENet.enet_address_get_host_ip(address, str_ptr, str_ptr.size)
+      raise "Failed to get IPv4 address of enet address" unless result.zero?
+
+      str_ptr.read_string
     end
 
     def initialize(peer)
       @_peer = peer
 
       @id = @_peer[:connect_id]
-      @address = Address.new(Client.enet_host_address_to_ipv4(@_peer[:address][:host]), @_peer[:address][:port])
+      @address = Address.new(Client.enet_host_address_to_ipv4(@_peer[:address]), @_peer[:address][:port])
     end
 
     def last_send_time

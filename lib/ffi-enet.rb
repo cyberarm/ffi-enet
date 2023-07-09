@@ -1,4 +1,5 @@
 require "ffi"
+require_relative "ffi-enet/version"
 
 module LibENet
   extend FFI::Library
@@ -371,8 +372,8 @@ end
   attach_function :enet_linked_version, [], :int
 
   # Address
-  attach_function :enet_address_get_host, [ENetAddress.by_ref, :string, :size_t], :int
-  attach_function :enet_address_get_host_ip, [ENetAddress.by_ref, :string, :size_t], :int
+  attach_function :enet_address_get_host, [ENetAddress.by_ref, :pointer, :size_t], :int
+  attach_function :enet_address_get_host_ip, [ENetAddress.by_ref, :pointer, :size_t], :int
   attach_function :enet_address_set_host, [ENetAddress.by_ref, :string], :int
   attach_function :enet_address_set_host_ip, [ENetAddress.by_ref, :string], :int
 
@@ -401,7 +402,7 @@ end
   attach_function :enet_peer_disconnect_now, [ENetPeer.by_ref, :uint32], :void
   attach_function :enet_peer_ping, [ENetPeer.by_ref], :void
   attach_function :enet_peer_ping_interval, [ENetPeer.by_ref, :uint32], :void
-  attach_function :enet_peer_receive, [ENetPeer.by_ref, :uchar], :pointer # FIXME
+  attach_function :enet_peer_receive, [ENetPeer.by_ref, :uchar], ENetPacket.by_ref # FIXME
   attach_function :enet_peer_reset, [ENetPeer.by_ref], :void
   attach_function :enet_peer_send, [ENetPeer.by_ref, :ushort, ENetPacket.by_ref], :int
   attach_function :enet_peer_throttle_configure, [ENetPeer.by_ref, :uint32, :uint32, :uint32], :void

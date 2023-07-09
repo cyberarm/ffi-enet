@@ -4,7 +4,7 @@ require_relative "lib/ffi-enet/version"
 
 Gem::Specification.new do |spec|
   spec.name = "ffi-enet"
-  spec.version = Enet::VERSION
+  spec.version = ENet::VERSION
   spec.authors = ["Cyberarm"]
   spec.email = ["matthewlikesrobots@gmail.com"]
 

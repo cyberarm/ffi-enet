@@ -1,8 +1,8 @@
-# Enet
+# FFI-ENet
 
-TODO: Delete this and the text below, and describe your gem
+FFI interface to the [enet](http://sauerbraten.org/enet/) networking library.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/enet`. To experiment with that code, run `bin/console` for an interactive prompt.
+Also includes a [rENet](https://github.com/Dahrkael/rENet/)-like API for easy usage.
 
 ## Installation
 
@@ -28,7 +28,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/enet.
+Bug reports and pull requests are welcome on GitHub at https://github.com/cyberarm/ffi-enet.
 
 ## License
 
