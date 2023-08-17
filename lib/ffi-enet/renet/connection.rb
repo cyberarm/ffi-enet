@@ -1,5 +1,7 @@
 module ENet
   class Connection
+    attr_reader :client
+
     def initialize(host:, port:, channels: 8, download_bandwidth: 0, upload_bandwidth: 0)
       @host = host
       @port = port
@@ -21,6 +23,12 @@ module ENet
       @_host = LibENet.enet_host_create(nil, 1, @channels, @download_bandwidth, @upload_bandwidth)
 
       raise "Failed to create host" if @_host.nil?
+
+      @client = nil
+    end
+
+    def online?
+      @online
     end
 
     def connect(timeout_ms)
@@ -31,21 +39,46 @@ module ENet
 
       if result.positive? && @enet_event[:type] == :ENET_EVENT_TYPE_CONNECT
         @online = true
+        @client = Client.new(@_connection)
 
         on_connection
       end
     end
 
     def disconnect(timeout_ms)
+      connected = online?
+
+      if connected
+        LibENet.enet_peer_disconnect(@_connection, 0)
+
+        while (result = LibENet.enet_host_service(@_host, @enet_event, 0)) && result.positive?
+
+          case @enet_event[:type]
+          when :ENET_EVENT_TYPE_RECEIVE
+            LibENet.enet_packet_destroy(@enet_event[:packet])
+
+          when :ENET_EVENT_TYPE_DISCONNECT
+            connected = false
+          end
+
+          break unless connected
+        end
+
+        LibENet.enet_peer_disconnect_now(@_connection, 0) if connected
+      end
+
+      connected
     end
 
     def send_packet(data, reliable:, channel:)
+      return unless online?
+
       packet = LibENet.enet_packet_create(data, data.length, reliable ? 1 : 0)
       LibENet.enet_peer_send(@_connection, channel, packet)
     end
 
     def send_queued_packets
-      LibENet.enet_host_flush(@_host)
+      LibENet.enet_host_flush(@_host) if online?
     end
 
     def flush
@@ -57,12 +90,6 @@ module ENet
 
       if result.positive?
         case @enet_event[:type]
-        when :ENET_EVENT_TYPE_NONE
-          puts :ENET_EVENT_TYPE_NONE
-
-        when :ENET_EVENT_TYPE_CONNECT
-          puts :ENET_EVENT_TYPE_CONNECT
-
         when :ENET_EVENT_TYPE_RECEIVE
           data = @enet_event[:packet][:data].read_string(@enet_event[:packet][:length])
 
@@ -71,11 +98,13 @@ module ENet
           LibENet.enet_packet_destroy(@enet_event[:packet])
 
         when :ENET_EVENT_TYPE_DISCONNECT
-          puts :ENET_EVENT_TYPE_DISCONNECT
+          @online = false
         end
       elsif result.negative?
         warn "An error occurred"
       end
+
+      @client.update_stats if online?
     end
 
     def use_compression(bool)

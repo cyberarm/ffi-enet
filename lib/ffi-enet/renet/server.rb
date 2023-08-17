@@ -1,5 +1,8 @@
 module ENet
   class Server
+    def self.release(pointer)
+    end
+
     def initialize(host:, port:, max_clients: 16, channels: 8, download_bandwidth: 0, upload_bandwidth: 0)
       @host = host
       @port = port
@@ -19,7 +22,7 @@ module ENet
       end
       @_address[:port] = @port
 
-      @_host = LibENet.enet_host_create(@_address, @max_clients, @channels, @download_bandwidth, @upload_bandwidth)
+      @_host = FFI::AutoPointer.new(LibENet.enet_host_create(@_address, @max_clients, @channels, @download_bandwidth, @upload_bandwidth).to_ptr, Server.method(:release))
       raise "Failed to create server" if @_host.nil?
     end
 
@@ -72,9 +75,6 @@ module ENet
 
       if result.positive?
         case @enet_event[:type]
-        when :ENET_EVENT_TYPE_NONE
-          puts :ENET_EVENT_TYPE_NONE
-
         when :ENET_EVENT_TYPE_CONNECT
           client = Client.new(@enet_event[:peer])
           @clients[client] = @enet_event[:peer]
@@ -85,13 +85,12 @@ module ENet
           client = @clients.find { |k, peer| peer.to_ptr == @enet_event[:peer].to_ptr }.first
           data = @enet_event[:packet][:data].read_string(@enet_event[:packet][:length])
 
+          client.update_stats
           on_packet_received(client, data, @enet_event[:channel_id])
 
           LibENet.enet_packet_destroy(@enet_event[:packet])
 
         when :ENET_EVENT_TYPE_DISCONNECT
-          puts :ENET_EVENT_TYPE_DISCONNECT
-
           # FIXME: This might not work if peer pointer is invalid
           client = @clients.find { |k, peer| peer.to_ptr == @enet_event[:peer].to_ptr }.first
           @clients.delete(client)

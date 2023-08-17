@@ -12,7 +12,7 @@ Thread.new do
   end
 
   def server.on_packet_received(client, data, channel)
-    puts "[SERVER][ID #{client.id}] #{data}"
+    puts "[SERVER][ID #{client.id}][TOTAL PACKETS: #{client.total_sent_packets}] #{data}"
     send_packet(client, data, reliable: true, channel: 1)
   end
 
@@ -49,6 +49,8 @@ end
 
 connection.connect(5_000)
 
-loop do
+while connection.online?
   connection.update(1_000)
+  connection.disconnect(2_000)
+  server.shutdown
 end
