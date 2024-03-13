@@ -296,7 +296,7 @@ module LibENet
   # FIXME: Layout is wrong due to doxygen alphabetizing fields...
   class ENetPeer < FFI::Struct
     layout :dispatchList, ENetListNode,
-      :host, ENetHost.by_ref,
+      :host, ENetHost,
       :outgoing_peer_id, :ushort,
       :incoming_peer_id, :ushort,
       :connect_id, :uint32,
@@ -378,23 +378,23 @@ module LibENet
   attach_function :enet_address_set_host_ip, [ENetAddress.by_ref, :string], :int
 
   # Host
-  attach_function :enet_host_bandwidth_limit, [ENetHost.by_ref, :uint32, :uint32], :void
-  attach_function :enet_host_broadcast, [ENetHost.by_ref, :uchar, :pointer], :void
-  attach_function :enet_host_channel_limit, [ENetHost.by_ref, :size_t], :void
-  attach_function :enet_host_check_events, [ENetHost.by_ref, ENetEvent.by_ref], :int
-  attach_function :enet_host_compress, [ENetHost.by_ref, ENetCompressor.by_ref], :int
-  attach_function :enet_host_compress_with_range_coder, [ENetHost.by_ref], :int
-  attach_function :enet_host_connect, [ENetHost.by_ref, ENetAddress.by_ref, :size_t, :uint32], ENetPeer.by_ref
-  attach_function :enet_host_create, [ENetAddress.by_ref, :size_t, :size_t, :uint32, :uint32], ENetHost.by_ref
-  attach_function :enet_host_destroy, [ENetHost.by_ref], :void
-  attach_function :enet_host_flush, [ENetHost.by_ref], :void
-  attach_function :enet_host_service, [ENetHost.by_ref, ENetEvent.by_ref, :uint32], :int, blocking: true
+  attach_function :enet_host_bandwidth_limit, [ENetHost, :uint32, :uint32], :void
+  attach_function :enet_host_broadcast, [ENetHost, :uchar, :pointer], :void
+  attach_function :enet_host_channel_limit, [ENetHost, :size_t], :void
+  attach_function :enet_host_check_events, [ENetHost, ENetEvent.by_ref], :int
+  attach_function :enet_host_compress, [ENetHost, ENetCompressor.by_ref], :int
+  attach_function :enet_host_compress_with_range_coder, [ENetHost], :int
+  attach_function :enet_host_connect, [ENetHost, ENetAddress.by_ref, :size_t, :uint32], ENetPeer.by_ref
+  attach_function :enet_host_create, [ENetAddress.by_ref, :size_t, :size_t, :uint32, :uint32], ENetHost
+  attach_function :enet_host_destroy, [ENetHost], :void
+  attach_function :enet_host_flush, [ENetHost], :void
+  attach_function :enet_host_service, [ENetHost, ENetEvent.by_ref, :uint32], :int, blocking: true
 
   # Packet
   attach_function :enet_crc32, [:pointer, :size_t], :uint32
   attach_function :enet_packet_create, [:string, :size_t, :uint32], ENetPacket.by_ref
   attach_function :enet_packet_destroy, [ENetPacket.by_ref], :void
-  attach_function :enet_packet_resize, [ENetHost.by_ref, :size_t], :int
+  attach_function :enet_packet_resize, [ENetHost, :size_t], :int
 
   # Peer
   attach_function :enet_peer_disconnect, [ENetPeer.by_ref, :uint32], :void

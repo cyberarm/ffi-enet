@@ -98,8 +98,13 @@ module ENet
           on_disconnection(client)
         end
       elsif result.negative?
-        warn "An error occurred"
+        warn "Server: An error occurred: #{result}"
       end
+    end
+
+    def shutdown
+      LibENet.enet_host_flush(@_host)
+      LibENet.enet_host_destroy(@_host)
     end
 
     def use_compression(bool)

@@ -1,28 +1,30 @@
 require_relative "../lib/ffi-enet"
 require_relative "../lib/ffi-enet/renet"
 
-Thread.new do
-  server = ENet::Server.new(host: "localhost", port: 3000, max_clients: 32, channels: 4, download_bandwidth: 0, upload_bandwidth: 0)
-  server.use_compression(true)
+Thread.abort_on_exception = true
+
+thread = Thread.new do
+  @server = ENet::Server.new(host: "localhost", port: 3000, max_clients: 32, channels: 4, download_bandwidth: 0, upload_bandwidth: 0)
+  @server.use_compression(true)
   # server.use_compression(false)
 
-  def server.on_connection(client)
+  def @server.on_connection(client)
     puts "[SERVER][ID #{client.id}] connected from #{client.address.host}:#{client.address.port}"
     send_packet(client, "Hello World", reliable: true, channel: 1)
   end
 
-  def server.on_packet_received(client, data, channel)
+  def @server.on_packet_received(client, data, channel)
     puts "[SERVER][ID #{client.id}][TOTAL PACKETS: #{client.total_sent_packets}] #{data}"
     send_packet(client, data, reliable: true, channel: 1)
   end
 
-  def server.on_disconnection(client)
+  def @server.on_disconnection(client)
     puts "[SERVER][ID #{client.id}] disconnected from #{client.address.host}"
     send_packet(client, "Goodbye World", reliable: true, channel: 1)
   end
 
   loop do
-    server.update(1_000)
+    @server.update(1_000)
   end
 end
 
@@ -52,5 +54,7 @@ connection.connect(5_000)
 while connection.online?
   connection.update(1_000)
   connection.disconnect(2_000)
-  server.shutdown
+  @server.shutdown
 end
+
+thread.join

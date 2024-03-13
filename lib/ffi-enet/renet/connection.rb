@@ -101,7 +101,7 @@ module ENet
           @online = false
         end
       elsif result.negative?
-        warn "An error occurred"
+        warn "Connection: An error occurred: #{result}"
       end
 
       @client.update_stats if online?
