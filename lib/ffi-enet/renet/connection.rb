@@ -31,18 +31,13 @@ module ENet
       @online
     end
 
+    def connected?
+      online?
+    end
+
     def connect(timeout_ms)
       @_connection = LibENet.enet_host_connect(@_host, @_address, @channels, 0)
       raise "Cannot connect to remote host" if @_connection.nil?
-
-      result = LibENet.enet_host_service(@_host, @enet_event, timeout_ms)
-
-      if result.positive? && @enet_event[:type] == :ENET_EVENT_TYPE_CONNECT
-        @online = true
-        @client = Client.new(@_connection)
-
-        on_connection
-      end
     end
 
     def disconnect(timeout_ms)
@@ -90,9 +85,15 @@ module ENet
 
       if result.positive?
         case @enet_event[:type]
+        when :ENET_EVENT_TYPE_CONNECT
+          @online = true
+          @client = Client.new(@_connection)
+
+          on_connection
         when :ENET_EVENT_TYPE_RECEIVE
           data = @enet_event[:packet][:data].read_string(@enet_event[:packet][:length])
 
+          @client.update_stats
           on_packet_received(data, @enet_event[:channel_id])
 
           LibENet.enet_packet_destroy(@enet_event[:packet])
@@ -103,8 +104,6 @@ module ENet
       elsif result.negative?
         warn "Connection: An error occurred: #{result}"
       end
-
-      @client.update_stats if online?
     end
 
     def use_compression(bool)

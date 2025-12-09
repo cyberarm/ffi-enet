@@ -23,32 +23,32 @@ module LibENet
   ENET_BUFFER_MAXIMUM = (1 + 2 * ENET_PROTOCOL_MAXIMUM_PACKET_COMMANDS)
 
   ENET_HOST_RECEIVE_BUFFER_SIZE = 256 * 1024,
-    ENET_HOST_SEND_BUFFER_SIZE = 256 * 1024,
-    ENET_HOST_BANDWIDTH_THROTTLE_INTERVAL = 1000,
-    ENET_HOST_DEFAULT_MTU = 1392,
-    ENET_HOST_DEFAULT_MAXIMUM_PACKET_SIZE = 32 * 1024 * 1024,
-    ENET_HOST_DEFAULT_MAXIMUM_WAITING_DATA = 32 * 1024 * 1024,
+  ENET_HOST_SEND_BUFFER_SIZE = 256 * 1024,
+  ENET_HOST_BANDWIDTH_THROTTLE_INTERVAL = 1000,
+  ENET_HOST_DEFAULT_MTU = 1392,
+  ENET_HOST_DEFAULT_MAXIMUM_PACKET_SIZE = 32 * 1024 * 1024,
+  ENET_HOST_DEFAULT_MAXIMUM_WAITING_DATA = 32 * 1024 * 1024,
 
-    ENET_PEER_DEFAULT_ROUND_TRIP_TIME = 500,
-    ENET_PEER_DEFAULT_PACKET_THROTTLE = 32,
-    ENET_PEER_PACKET_THROTTLE_SCALE = 32,
-    ENET_PEER_PACKET_THROTTLE_COUNTER = 7,
-    ENET_PEER_PACKET_THROTTLE_ACCELERATION = 2,
-    ENET_PEER_PACKET_THROTTLE_DECELERATION = 2,
-    ENET_PEER_PACKET_THROTTLE_INTERVAL = 5000,
-    ENET_PEER_PACKET_LOSS_SCALE = (1 << 16),
-    ENET_PEER_PACKET_LOSS_INTERVAL = 10000,
-    ENET_PEER_WINDOW_SIZE_SCALE = 64 * 1024,
-    ENET_PEER_TIMEOUT_LIMIT = 32,
-    ENET_PEER_TIMEOUT_MINIMUM = 5000,
-    ENET_PEER_TIMEOUT_MAXIMUM = 30000,
-    ENET_PEER_PING_INTERVAL = 500,
-    ENET_PEER_UNSEQUENCED_WINDOWS = 64,
-    ENET_PEER_UNSEQUENCED_WINDOW_SIZE = 1024,
-    ENET_PEER_FREE_UNSEQUENCED_WINDOWS = 32,
-    ENET_PEER_RELIABLE_WINDOWS = 16,
-    ENET_PEER_RELIABLE_WINDOW_SIZE = 0x1000,
-    ENET_PEER_FREE_RELIABLE_WINDOWS = 8
+  ENET_PEER_DEFAULT_ROUND_TRIP_TIME = 500,
+  ENET_PEER_DEFAULT_PACKET_THROTTLE = 32,
+  ENET_PEER_PACKET_THROTTLE_SCALE = 32,
+  ENET_PEER_PACKET_THROTTLE_COUNTER = 7,
+  ENET_PEER_PACKET_THROTTLE_ACCELERATION = 2,
+  ENET_PEER_PACKET_THROTTLE_DECELERATION = 2,
+  ENET_PEER_PACKET_THROTTLE_INTERVAL = 5000,
+  ENET_PEER_PACKET_LOSS_SCALE = (1 << 16),
+  ENET_PEER_PACKET_LOSS_INTERVAL = 10000,
+  ENET_PEER_WINDOW_SIZE_SCALE = 64 * 1024,
+  ENET_PEER_TIMEOUT_LIMIT = 32,
+  ENET_PEER_TIMEOUT_MINIMUM = 5000,
+  ENET_PEER_TIMEOUT_MAXIMUM = 30000,
+  ENET_PEER_PING_INTERVAL = 500,
+  ENET_PEER_UNSEQUENCED_WINDOWS = 64,
+  ENET_PEER_UNSEQUENCED_WINDOW_SIZE = 1024,
+  ENET_PEER_FREE_UNSEQUENCED_WINDOWS = 32,
+  ENET_PEER_RELIABLE_WINDOWS = 16,
+  ENET_PEER_RELIABLE_WINDOW_SIZE = 0x1000,
+  ENET_PEER_FREE_RELIABLE_WINDOWS = 8
 
   # Enums
   ENetEventType = enum(
@@ -71,181 +71,234 @@ module LibENet
     :ENET_PEER_STATE_ZOMBIE
   )
 
-  # ENetSocketOption = enum(
-  #   :ENET_SOCKOPT_NONBLOCK,
-  #   :ENET_SOCKOPT_BROADCAST,
-  #   :ENET_SOCKOPT_RCVBUF,
-  #   :ENET_SOCKOPT_SNDBUF,
-  #   :ENET_SOCKOPT_REUSEADDR,
-  #   :ENET_SOCKOPT_RCVTIMEO,
-  #   :ENET_SOCKOPT_SNDTIMEO,
-  #   :ENET_SOCKOPT_ERROR,
-  #   :ENET_SOCKOPT_NODELAY
-  # )
+  ENetSocketOption = enum(
+    :ENET_SOCKOPT_NONBLOCK, 1,
+    :ENET_SOCKOPT_BROADCAST,
+    :ENET_SOCKOPT_RCVBUF,
+    :ENET_SOCKOPT_SNDBUF,
+    :ENET_SOCKOPT_REUSEADDR,
+    :ENET_SOCKOPT_RCVTIMEO,
+    :ENET_SOCKOPT_SNDTIMEO,
+    :ENET_SOCKOPT_ERROR,
+    :ENET_SOCKOPT_NODELAY,
+    :ENET_SOCKOPT_TTL
+  )
 
-  # ENetSocketType = enum(
-  #   :ENET_SOCKET_TYPE_STREAM,
-  #   :ENET_SOCKET_TYPE_DATAGRAM
-  # )
+  ENetSocketShutdown = enum(
+    :ENET_SOCKET_SHUTDOWN_READ,
+    :ENET_SOCKET_SHUTDOWN_WRITE,
+    :ENET_SOCKET_SHUTDOWN_READ_WRITE
+  )
+
+  ENetSocketType = enum(
+    :ENET_SOCKET_TYPE_STREAM, 1,
+    :ENET_SOCKET_TYPE_DATAGRAM
+  )
+
+  ENetPacketFlag = enum(
+     :ENET_PACKET_FLAG_RELIABLE, (1 << 0),
+     :ENET_PACKET_FLAG_UNSEQUENCED, (1 << 1),
+     :ENET_PACKET_FLAG_NO_ALLOCATE, (1 << 2),
+     :ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT, (1 << 3),
+     :ENET_PACKET_FLAG_SENT, (1<<8)
+)
 
   # Structs
   class ENetAddress < FFI::Struct
-    layout :host, :uint32,
+    layout(
+      :host, :uint32,
       :port, :ushort
+    )
   end
 
   class ENetPacket < FFI::Struct
-    layout :_ref_count, :size_t,
+    layout(
+      :_ref_count, :size_t,
       :flags, :uint32,
       :data, :pointer,
       :length, :short,
       :callback, :pointer,
       :user_data, :pointer
+    )
   end
 
   # Why on earth would you do this? They're the same types...
   if FFI::Platform.windows?
     # Windows O_o
     class ENetBuffer < FFI::Struct
-      layout :length, :size_t,
+      layout(
+        :length, :size_t,
         :data, :pointer
+      )
     end
   else
     # Unix o_O
     class ENetBuffer < FFI::Struct
-      layout :data, :pointer,
+      layout(
+        :data, :pointer,
         :length, :size_t
+      )
     end
   end
 
   class ENetCompressor < FFI::Struct
-    layout :context, :pointer,
+    layout(
+      :context, :pointer,
       :compress, :pointer, # FIXME: http://sauerbraten.org/enet/structENetCompressor.html
       :decompress, :pointer, # FIXME
       :destroy, :pointer  # FIXME
+    )
   end
 
   class ENetListNode < FFI::Struct
-    layout :nxt, ENetListNode.by_ref,
+    layout(
+      :next, ENetListNode.by_ref,
       :previous, ENetListNode.by_ref
+    )
   end
 
   class ENetList < FFI::Struct
-    layout :sentinel, ENetListNode
+    layout(:sentinel, ENetListNode)
   end
 
   class ENetProtocolHeader < FFI::Struct
-    layout :peer_id, :ushort,
+    layout(
+      :peer_id, :ushort,
       :sent_time, :ushort
+    )
   end
 
   class ENetProtocolCommandHeader < FFI::Struct
-    layout :command, :uchar,
+    layout(
+      :command, :uchar,
       :channel_id, :uchar,
       :reliable_sequence_number, :ushort
+    )
   end
 
   class ENetProtocolAcknowledge < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
+    layout(
+      :header, ENetProtocolCommandHeader,
       :received_reliable_sequence_number, :ushort,
       :received_sent_time, :ushort
+    )
   end
 
   class ENetProtocolConnect < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :outgoingPeerID, :ushort,
-      :incomingSessionID, :uchar,
-      :outgoingSessionID, :uchar,
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :outgoing_peer_id, :ushort,
+      :incoming_session_id, :uchar,
+      :outgoing_session_id, :uchar,
       :mtu, :uint32,
-      :windowSize, :uint32,
-      :channelCount, :uint32,
-      :incomingBandwidth, :uint32,
-      :outgoingBandwidth, :uint32,
-      :packetThrottleInterval, :uint32,
-      :packetThrottleAcceleration, :uint32,
-      :packetThrottleDeceleration, :uint32,
+      :window_size, :uint32,
+      :channel_count, :uint32,
+      :incoming_bandwidth, :uint32,
+      :outgoing_bandwidth, :uint32,
+      :packet_throttle_interval, :uint32,
+      :packet_throttle_acceleration, :uint32,
+      :packet_throttle_deceleration, :uint32,
       :connectID, :uint32,
       :data, :uint32
+    )
   end
 
   class ENetProtocolVerifyConnect < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :outgoingPeerID, :ushort,
-      :incomingSessionID, :uchar,
-      :outgoingSessionID, :uchar,
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :outgoing_peer_id, :ushort,
+      :incoming_session_id, :uchar,
+      :outgoing_session_id, :uchar,
       :mtu, :uint32,
-      :windowSize, :uint32,
-      :channelCount, :uint32,
-      :incomingBandwidth, :uint32,
-      :outgoingBandwidth, :uint32,
-      :packetThrottleInterval, :uint32,
-      :packetThrottleAcceleration, :uint32,
-      :packetThrottleDeceleration, :uint32,
-      :connectID, :uint32
+      :window_size, :uint32,
+      :channel_count, :uint32,
+      :incoming_bandwidth, :uint32,
+      :outgoing_bandwidth, :uint32,
+      :packet_throttle_interval, :uint32,
+      :packet_throttle_acceleration, :uint32,
+      :packet_throttle_deceleration, :uint32,
+      :connect_id, :uint32
+    )
   end
 
   class ENetProtocolBandwidthLimit < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :incomingBandwidth, :uint32,
-      :outgoingBandwidth, :uint32
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :incoming_bandwidth, :uint32,
+      :outgoing_bandwidth, :uint32
+    )
   end
 
   class ENetProtocolThrottleConfigure < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :packetThrottleInterval, :uint32,
-      :packetThrottleAcceleration, :uint32,
-      :packetThrottleDeceleration, :uint32
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :packet_throttle_interval, :uint32,
+      :packet_throttle_acceleration, :uint32,
+      :packet_throttle_deceleration, :uint32
+    )
   end
 
   class ENetProtocolDisconnect < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
+    layout(
+      :header, ENetProtocolCommandHeader,
       :data, :uint32
+    )
   end
 
   class ENetProtocolPing < FFI::Struct
-    layout :header, ENetProtocolCommandHeader
+    layout(:header, ENetProtocolCommandHeader)
   end
 
   class ENetProtocolSendReliable < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :dataLength, :ushort
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :data_length, :ushort
+    )
   end
 
   class ENetProtocolSendUnreliable < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :unreliableSequenceNumber, :ushort,
-      :dataLength, :ushort
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :unreliable_sequence_number, :ushort,
+      :data_length, :ushort
+    )
   end
 
   class ENetProtocolSendUnsequenced < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :unsequencedGroup, :ushort,
-      :dataLength, :ushort
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :unsequenced_group, :ushort,
+      :data_length, :ushort
+    )
   end
 
   class ENetProtocolSendFragment < FFI::Struct
-    layout :header, ENetProtocolCommandHeader,
-      :startSequenceNumber, :ushort,
-      :dataLength, :ushort,
-      :fragmentCount, :uint32,
-      :fragmentNumber, :uint32,
-      :totalLength, :uint32,
-      :fragmentOffset, :uint32
+    layout(
+      :header, ENetProtocolCommandHeader,
+      :start_sequence_number, :ushort,
+      :data_length, :ushort,
+      :fragment_count, :uint32,
+      :fragment_number, :uint32,
+      :total_length, :uint32,
+      :fragment_offset, :uint32
+    )
   end
 
   class ENetProtocol < FFI::Union
-    layout :header, ENetProtocolCommandHeader,
+    layout(
+      :header, ENetProtocolCommandHeader,
       :acknowledge, ENetProtocolAcknowledge,
       :connect, ENetProtocolConnect,
-      :verifyConnect, ENetProtocolVerifyConnect,
+      :verify_connect, ENetProtocolVerifyConnect,
       :disconnect, ENetProtocolDisconnect,
       :ping, ENetProtocolPing,
-      :sendReliable, ENetProtocolSendReliable,
-      :sendUnreliable, ENetProtocolSendUnreliable,
-      :sendUnsequenced, ENetProtocolSendUnsequenced,
-      :sendFragment, ENetProtocolSendFragment,
-      :bandwidthLimit, ENetProtocolBandwidthLimit,
-      :throttleConfigure, ENetProtocolThrottleConfigure
+      :send_reliable, ENetProtocolSendReliable,
+      :send_unreliable, ENetProtocolSendUnreliable,
+      :send_unsequenced, ENetProtocolSendUnsequenced,
+      :send_fragment, ENetProtocolSendFragment,
+      :bandwidth_limit, ENetProtocolBandwidthLimit,
+      :throttle_configure, ENetProtocolThrottleConfigure
+    )
   end
 
   if FFI::Platform.windows?
@@ -255,7 +308,8 @@ module LibENet
   end
 
   class ENetHost < FFI::Struct
-    layout :socket, :ENetSocket,
+    layout(
+      :socket, :ENetSocket,
       :address, ENetAddress,
       :incoming_bandwidth, :uint32,
       :outgoing_bandwidth, :uint32,
@@ -291,11 +345,13 @@ module LibENet
       :duplicate_peers, :size_t,
       :maximum_packet_size, :size_t,
       :maximum_waiting_data, :size_t
+    )
   end
 
   # FIXME: Layout is wrong due to doxygen alphabetizing fields...
   class ENetPeer < FFI::Struct
-    layout :dispatchList, ENetListNode,
+    layout(
+      :dispatchList, ENetListNode,
       :host, ENetHost,
       :outgoing_peer_id, :ushort,
       :incoming_peer_id, :ushort,
@@ -355,14 +411,17 @@ module LibENet
       :unsequenced_window, [:uint32, ENET_PEER_UNSEQUENCED_WINDOW_SIZE / 32],
       :event_data, :uint32,
       :total_waiting_data, :size_t
+    )
   end
 
   class ENetEvent < FFI::Struct
-    layout :type, ENetEventType,
+    layout(
+      :type, ENetEventType,
       :peer, ENetPeer.by_ref,
       :channel_id, :uchar,
       :data, :uint32,
       :packet, ENetPacket.by_ref
+    )
   end
 
   # Global
