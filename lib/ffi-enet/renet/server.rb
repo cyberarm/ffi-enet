@@ -14,7 +14,7 @@ module ENet
       @enet_event = LibENet::ENetEvent.new
       @clients = {}
 
-      ENet.init
+      raise RuntimeError, "Failed to initialize ENet" unless ENet.init
 
       @_address = LibENet::ENetAddress.new
       if LibENet.enet_address_set_host(@_address, @host) != 0

@@ -107,7 +107,7 @@ module LibENet
   class ENetAddress < FFI::Struct
     layout(
       :host, :uint32,
-      :port, :ushort
+      :port, :uint16
     )
   end
 
@@ -116,7 +116,7 @@ module LibENet
       :_ref_count, :size_t,
       :flags, :uint32,
       :data, :pointer,
-      :length, :short,
+      :length, :size_t,
       :callback, :pointer,
       :user_data, :pointer
     )
@@ -163,33 +163,33 @@ module LibENet
 
   class ENetProtocolHeader < FFI::Struct
     layout(
-      :peer_id, :ushort,
-      :sent_time, :ushort
+      :peer_id, :uint16,
+      :sent_time, :uint16
     )
   end
 
   class ENetProtocolCommandHeader < FFI::Struct
     layout(
-      :command, :uchar,
-      :channel_id, :uchar,
-      :reliable_sequence_number, :ushort
+      :command, :uint8,
+      :channel_id, :uint8,
+      :reliable_sequence_number, :uint16
     )
   end
 
   class ENetProtocolAcknowledge < FFI::Struct
     layout(
       :header, ENetProtocolCommandHeader,
-      :received_reliable_sequence_number, :ushort,
-      :received_sent_time, :ushort
+      :received_reliable_sequence_number, :uint16,
+      :received_sent_time, :uint16
     )
   end
 
   class ENetProtocolConnect < FFI::Struct
     layout(
       :header, ENetProtocolCommandHeader,
-      :outgoing_peer_id, :ushort,
-      :incoming_session_id, :uchar,
-      :outgoing_session_id, :uchar,
+      :outgoing_peer_id, :uint16,
+      :incoming_session_id, :uint8,
+      :outgoing_session_id, :uint8,
       :mtu, :uint32,
       :window_size, :uint32,
       :channel_count, :uint32,
@@ -206,9 +206,9 @@ module LibENet
   class ENetProtocolVerifyConnect < FFI::Struct
     layout(
       :header, ENetProtocolCommandHeader,
-      :outgoing_peer_id, :ushort,
-      :incoming_session_id, :uchar,
-      :outgoing_session_id, :uchar,
+      :outgoing_peer_id, :uint16,
+      :incoming_session_id, :uint8,
+      :outgoing_session_id, :uint8,
       :mtu, :uint32,
       :window_size, :uint32,
       :channel_count, :uint32,
@@ -252,31 +252,31 @@ module LibENet
   class ENetProtocolSendReliable < FFI::Struct
     layout(
       :header, ENetProtocolCommandHeader,
-      :data_length, :ushort
+      :data_length, :uint16
     )
   end
 
   class ENetProtocolSendUnreliable < FFI::Struct
     layout(
       :header, ENetProtocolCommandHeader,
-      :unreliable_sequence_number, :ushort,
-      :data_length, :ushort
+      :unreliable_sequence_number, :uint16,
+      :data_length, :uint16
     )
   end
 
   class ENetProtocolSendUnsequenced < FFI::Struct
     layout(
       :header, ENetProtocolCommandHeader,
-      :unsequenced_group, :ushort,
-      :data_length, :ushort
+      :unsequenced_group, :uint16,
+      :data_length, :uint16
     )
   end
 
   class ENetProtocolSendFragment < FFI::Struct
     layout(
       :header, ENetProtocolCommandHeader,
-      :start_sequence_number, :ushort,
-      :data_length, :ushort,
+      :start_sequence_number, :uint16,
+      :data_length, :uint16,
       :fragment_count, :uint32,
       :fragment_number, :uint32,
       :total_length, :uint32,
@@ -307,6 +307,19 @@ module LibENet
     typedef(:int, :ENetSocket) # FIXME: Test this on Linux
   end
 
+  class ENetChannel < FFI::Struct
+    layout(
+      :outgoing_reliable_sequence_number, :uint16,
+      :outgoing_unreliable_sequence_number, :uint16,
+      :used_reliable_windows, :uint16,
+      :reliable_Windows, [:uint16, ENET_PEER_RELIABLE_WINDOWS],
+      :incoming_reliable_sequence_number, :uint16,
+      :incoming_unreliable_sequence_number, :uint16,
+      :incoming_reliable_commands, ENetList,
+      :incoming_unreliable_commands, ENetList
+     )
+  end
+
   class ENetHost < FFI::Struct
     layout(
       :socket, :ENetSocket,
@@ -321,17 +334,17 @@ module LibENet
       :peer_count, :size_t,
       :channel_limit, :size_t,
       :service_time, :uint32,
-      :dispatch_queue, :pointer, # ENetList
+      :dispatch_queue, ENetList,
       :total_queued, :uint32,
       :packet_size, :size_t,
-      :header_flags, :ushort,
+      :header_flags, :uint16,
       :commands, [ENetProtocol, ENET_PROTOCOL_MAXIMUM_PACKET_COMMANDS],
       :command_count, :size_t,
       :buffers, [ENetBuffer, ENET_BUFFER_MAXIMUM],
       :buffer_count, :size_t,
       :checksum, :pointer, # ENetChecksumCallback
       :compressor, ENetCompressor,
-      :packet_data, [:uchar, 2 * ENET_PROTOCOL_MAXIMUM_MTU], # NOTE: This may be wrong size/offset/length... using a 1d array here, instead of [2][ENET_PROTOCOL_MAXIMUM_MTU]; FFI docs don't seem to show how to do a multidimentional array.
+      :packet_data, [:uint8, 2 * ENET_PROTOCOL_MAXIMUM_MTU], # NOTE: This may be wrong size/offset/length... using a 1d array here, instead of [2][ENET_PROTOCOL_MAXIMUM_MTU]; FFI docs don't seem to show how to do a multidimentional array.
       :received_address, ENetAddress,
       :received_data, :string,
       :received_data_length, :size_t,
@@ -352,16 +365,16 @@ module LibENet
   class ENetPeer < FFI::Struct
     layout(
       :dispatchList, ENetListNode,
-      :host, ENetHost,
-      :outgoing_peer_id, :ushort,
-      :incoming_peer_id, :ushort,
+      :host, ENetHost.by_ref,
+      :outgoing_peer_id, :uint16,
+      :incoming_peer_id, :uint16,
       :connect_id, :uint32,
-      :outgoing_session_id, :uchar,
-      :incoming_session_id, :uchar,
+      :outgoing_session_id, :uint8,
+      :incoming_session_id, :uint8,
       :address, ENetAddress,
       :data, :pointer,
       :state, ENetPeerState,
-      :channels, :pointer, # ENetChannel
+      :channels, :pointer, # array of ENetChannel
       :channel_count, :size_t,
       :incoming_bandwidth, :uint32,
       :outgoing_bandwidth, :uint32,
@@ -398,16 +411,16 @@ module LibENet
       :mtu, :uint32,
       :window_size, :uint32,
       :reliable_data_in_transit, :uint32,
-      :outgoing_reliable_sequence_number, :ushort,
+      :outgoing_reliable_sequence_number, :uint16,
       :acknowledgements, ENetList,
       :sent_reliable_commands, ENetList,
       :outgoing_send_reliable_commands, ENetList,
       :outgoing_commands, ENetList,
       :dispatched_commands, ENetList,
-      :flags, :ushort,
-      :reserved, :ushort,
-      :incoming_unsequenced_group, :ushort,
-      :outgoing_unsequenced_group, :ushort,
+      :flags, :uint16,
+      :reserved, :uint16,
+      :incoming_unsequenced_group, :uint16,
+      :outgoing_unsequenced_group, :uint16,
       :unsequenced_window, [:uint32, ENET_PEER_UNSEQUENCED_WINDOW_SIZE / 32],
       :event_data, :uint32,
       :total_waiting_data, :size_t
@@ -418,7 +431,7 @@ module LibENet
     layout(
       :type, ENetEventType,
       :peer, ENetPeer.by_ref,
-      :channel_id, :uchar,
+      :channel_id, :uint8,
       :data, :uint32,
       :packet, ENetPacket.by_ref
     )
@@ -426,9 +439,9 @@ module LibENet
 
   # Global
   attach_function :enet_deinitialize, [], :void
-  attach_function :enet_initialize, [], :void
-  attach_function :enet_initialize_with_callbacks, [:uint32, :pointer], :void # FIXME
-  attach_function :enet_linked_version, [], :int
+  attach_function :enet_initialize, [], :int
+  attach_function :enet_initialize_with_callbacks, [:uint32, :pointer], :int # FIXME
+  attach_function :enet_linked_version, [], :uint
 
   # Address
   attach_function :enet_address_get_host, [ENetAddress.by_ref, :pointer, :size_t], :int
@@ -438,7 +451,7 @@ module LibENet
 
   # Host
   attach_function :enet_host_bandwidth_limit, [ENetHost, :uint32, :uint32], :void
-  attach_function :enet_host_broadcast, [ENetHost, :uchar, :pointer], :void
+  attach_function :enet_host_broadcast, [ENetHost, :uint8, :pointer], :void
   attach_function :enet_host_channel_limit, [ENetHost, :size_t], :void
   attach_function :enet_host_check_events, [ENetHost, ENetEvent.by_ref], :int
   attach_function :enet_host_compress, [ENetHost, ENetCompressor.by_ref], :int
@@ -461,35 +474,17 @@ module LibENet
   attach_function :enet_peer_disconnect_now, [ENetPeer.by_ref, :uint32], :void
   attach_function :enet_peer_ping, [ENetPeer.by_ref], :void
   attach_function :enet_peer_ping_interval, [ENetPeer.by_ref, :uint32], :void
-  attach_function :enet_peer_receive, [ENetPeer.by_ref, :uchar], ENetPacket.by_ref # FIXME
+  attach_function :enet_peer_receive, [ENetPeer.by_ref, :uint8], ENetPacket.by_ref # FIXME
   attach_function :enet_peer_reset, [ENetPeer.by_ref], :void
-  attach_function :enet_peer_send, [ENetPeer.by_ref, :ushort, ENetPacket.by_ref], :int
+  attach_function :enet_peer_send, [ENetPeer.by_ref, :uint16, ENetPacket.by_ref], :int
   attach_function :enet_peer_throttle_configure, [ENetPeer.by_ref, :uint32, :uint32, :uint32], :void
   attach_function :enet_peer_timeout, [ENetPeer.by_ref, :uint32, :uint32, :uint32], :void
 
   # Range Coder
-  attach_function :enet_range_coder_compress, [:pointer, ENetBuffer.by_ref, :size_t, :size_t, :uchar, :size_t], :size_t
+  attach_function :enet_range_coder_compress, [:pointer, ENetBuffer.by_ref, :size_t, :size_t, :uint8, :size_t], :size_t
   attach_function :enet_range_coder_create, [], :pointer
-  attach_function :enet_range_coder_decompress, [:pointer, :ushort, :size_t, :ushort, :size_t], :size_t
+  attach_function :enet_range_coder_decompress, [:pointer, :uint16, :size_t, :uint16, :size_t], :size_t
   attach_function :enet_range_coder_destroy, [:pointer], :void
-
-  # Socket
-  # typedef(:int, :ENetSocket)
-
-  # attach_function :enet_socket_accept, [:ENetSocket, ENetAddress.by_ref], :ENetSocket
-  # attach_function :enet_socket_bind, [:ENetSocket, ENetAddress.by_ref], :int
-  # attach_function :enet_socket_connect, [:ENetSocket, ENetAddress.by_ref], :int
-  # attach_function :enet_socket_create, [:uint32], :ENetSocket
-  # attach_function :enet_socket_destroy, [:ENetSocket], :void
-  # attach_function :enet_socket_get_address, [:ENetSocket, ENetAddress.by_ref], :int
-  # attach_function :enet_socket_get_option, [:ENetSocket, ENetSocketOption, :int], :int
-  # attach_function :enet_socket_listen, [:ENetSocket, :int], :int
-  # attach_function :enet_socket_receive, [:ENetSocket, ENetAddress.by_ref, ENetBuffer.by_ref, :size_t], :int
-  # attach_function :enet_socket_send, [:ENetSocket, ENetAddress.by_ref, ENetBuffer.by_ref, :size_t], :int
-  # attach_function :enet_socket_set_option, [:ENetSocket, ENetSocketOption, :pointer], :int
-  # attach_function :enet_socket_shutdown, [:ENetSocket, ENetSocketShutdown], :int
-  # attach_function :enet_socket_wait, [:ENetSocket, :pointer, :uint32], :int
-  # attach_function :enet_socketset_select, [:ENetSocket, ENetSocketSet.by_ref, ENetSocketSet.by_ref, :uint32], :int
 
   # Time
   attach_function :enet_time_get, [], :uint32

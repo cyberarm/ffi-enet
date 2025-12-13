@@ -20,6 +20,9 @@ module ENet
       @id = @_peer[:connect_id]
       @address = Address.new(Client.enet_host_address_to_ipv4(@_peer[:address]), @_peer[:address][:port])
 
+      # pp @_peer[:address][:host]
+      # raise unless @_peer[:address][:host] == 16777343
+
       @last_send_time = 0
       @last_receive_time = 0
       @last_round_trip_time = 0

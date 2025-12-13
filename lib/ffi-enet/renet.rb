@@ -9,7 +9,8 @@ module ENet
   def self.init
     return true if @@initialized
 
-    return false if LibENet.enet_initialize != 0
+    result = LibENet.enet_initialize
+    return false if result.negative?
 
     @@initialized = true
 
