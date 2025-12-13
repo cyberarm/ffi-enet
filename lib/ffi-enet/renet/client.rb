@@ -20,9 +20,6 @@ module ENet
       @id = @_peer[:connect_id]
       @address = Address.new(Client.enet_host_address_to_ipv4(@_peer[:address]), @_peer[:address][:port])
 
-      # pp @_peer[:address][:host]
-      # raise unless @_peer[:address][:host] == 16777343
-
       @last_send_time = 0
       @last_receive_time = 0
       @last_round_trip_time = 0
@@ -48,15 +45,10 @@ module ENet
       @packet_loss = @_peer[:packet_loss] # .to_f / LibENet::ENET_PEER_PACKET_LOSS_SCALE
 
       # enet Host data
-      @total_sent_packets += @_peer[:host][:total_sent_packets]
-      @total_sent_data += @_peer[:host][:total_sent_data]
-      @total_received_packets += @_peer[:host][:total_received_packets]
-      @total_received_data += @_peer[:host][:total_received_data]
-
-      @_peer[:host][:total_sent_packets] = 0
-      @_peer[:host][:total_sent_data] = 0
-      @_peer[:host][:total_received_packets] = 0
-      @_peer[:host][:total_received_data] = 0
+      @total_sent_packets = @_peer[:host][:total_sent_packets]
+      @total_sent_data = @_peer[:host][:total_sent_data]
+      @total_received_packets = @_peer[:host][:total_received_packets]
+      @total_received_data = @_peer[:host][:total_received_data]
     end
   end
 end
