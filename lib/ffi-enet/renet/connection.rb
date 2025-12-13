@@ -104,6 +104,8 @@ module ENet
       elsif result.negative?
         warn "Connection: An error occurred: #{result}"
       end
+
+      result
     end
 
     def use_compression(bool)

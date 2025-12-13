@@ -100,6 +100,8 @@ module ENet
       elsif result.negative?
         warn "Server: An error occurred: #{result}"
       end
+
+      result
     end
 
     def shutdown
