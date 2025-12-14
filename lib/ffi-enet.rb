@@ -361,7 +361,6 @@ module LibENet
     )
   end
 
-  # FIXME: Layout is wrong due to doxygen alphabetizing fields...
   class ENetPeer < FFI::Struct
     layout(
       :dispatchList, ENetListNode,

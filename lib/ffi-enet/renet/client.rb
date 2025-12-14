@@ -42,7 +42,7 @@ module ENet
       @last_round_trip_time = @_peer[:last_round_trip_time]
       @round_trip_time = @_peer[:round_trip_time]
       @packets_lost = @_peer[:packets_lost]
-      @packet_loss = @_peer[:packet_loss] # .to_f / LibENet::ENET_PEER_PACKET_LOSS_SCALE
+      @packet_loss = @_peer[:packet_loss].to_f / LibENet::ENET_PEER_PACKET_LOSS_SCALE
 
       # enet Host data
       @total_sent_packets = @_peer[:host][:total_sent_packets]
